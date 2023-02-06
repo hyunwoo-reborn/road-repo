@@ -1,2 +1,3 @@
-FROM mysql:8.0.22
+FROM mariadb:10
+
 ENV TZ=Asia/Seoul
