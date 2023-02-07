@@ -33,4 +33,5 @@ class KakaoAddressSearchServiceTest extends AbstractIntegrationContainerBaseTest
         result.metaDto.totalCount > 0
         result.documentList.get(0).addressName != null
     }
+
 }
