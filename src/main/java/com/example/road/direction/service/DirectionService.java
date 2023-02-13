@@ -1,12 +1,16 @@
 package com.example.road.direction.service;
 
 import com.example.road.api.dto.DocumentDto;
+import com.example.road.api.service.KakaoCategorySearchService;
 import com.example.road.direction.entity.Direction;
+import com.example.road.direction.repository.DirectionRepository;
 import com.example.road.pharmacy.dto.PharmacyDto;
 import com.example.road.pharmacy.service.PharmacySearchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 import java.util.Collection;
@@ -22,8 +26,18 @@ public class DirectionService {
 
     private static final int MAX_SEARCH_COUNT = 3; // 약국 최대 검색 갯수
     private static final double RADIUS_KM = 10.0; // 반경 10 km
+    private static final String DIRECTION_BASE_URL = "https://map.kakao.com/link/map/";
 
     private final PharmacySearchService pharmacySearchService;
+    private final DirectionRepository directionRepository;
+    private final KakaoCategorySearchService kakaoCategorySearchService;
+//    private final Base62Service base62Service;
+
+    @Transactional
+    public List<Direction> saveAll(List<Direction> directionList) {
+        if(CollectionUtils.isEmpty(directionList)) return Collections.emptyList();
+        return directionRepository.saveAll(directionList);
+    }
 
     public List<Direction> buildDirectionList(DocumentDto documentDto) {
 
