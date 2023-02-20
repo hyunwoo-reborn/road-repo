@@ -24,7 +24,6 @@ public class KakaoAddressSearchService {
     private final RestTemplate restTemplate;
     private final KakaoUriBuilderService kakaoUriBuilderService;
 
-
     @Value("${kakao.rest.api.key}")
     private String kakaoRestApiKey;
 
@@ -40,13 +39,11 @@ public class KakaoAddressSearchService {
         URI uri = kakaoUriBuilderService.buildUriByAddressSearch(address);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.set(HttpHeaders.AUTHORIZATION, "KakaoAK " + kakaoRestApiKey);
-
-        HttpEntity<?> httpEntity = new HttpEntity<>(headers);
+        headers.set(HttpHeaders.AUTHORIZATION, "KakaoAK " +kakaoRestApiKey);
+        HttpEntity httpEntity = new HttpEntity<>(headers);
 
         // kakao api 호출
         return restTemplate.exchange(uri, HttpMethod.GET, httpEntity, KakaoApiResponseDto.class).getBody();
-
     }
 
     //원래 메소드의 리턴 타입을 맞춰야 함

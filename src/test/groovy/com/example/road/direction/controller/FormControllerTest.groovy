@@ -19,7 +19,7 @@ class FormControllerTest extends Specification {
 
     def setup() {
         // FormController MockMvc 객체로 만든다.
-        mockMvc = MockMvcBuilders.standaloneSetup(new FormController(pharmacyRecommendationService))
+        mockMvc= MockMvcBuilders.standaloneSetup(new FormController(pharmacyRecommendationService))
             .build()
 
         outputDtoList = new ArrayList<>()
@@ -35,8 +35,9 @@ class FormControllerTest extends Specification {
 
     def "GET /"() {
         expect:
-        // FormController 의 "/" URI를 get 방식으로 호출
+        // FormController 의 "/" URI를 get방식으로 호출
         mockMvc.perform(get("/"))
+            .andExpect(handler().handlerType(FormController.class))
             .andExpect(handler().methodName("main"))
             .andExpect(status().isOk())
             .andExpect(view().name("main"))
@@ -44,6 +45,7 @@ class FormControllerTest extends Specification {
     }
 
     def "POST /search"() {
+
         given:
         String inputAddress = "서울 성북구 종암동"
 
@@ -54,7 +56,7 @@ class FormControllerTest extends Specification {
         then:
         1 * pharmacyRecommendationService.recommendPharmacyList(argument -> {
             assert argument == inputAddress // mock 객체의 argument 검증
-        }) >> outputDtoList // stubbing
+        }) >> outputDtoList
 
         resultActions
                 .andExpect(status().isOk())
@@ -63,5 +65,4 @@ class FormControllerTest extends Specification {
                 .andExpect(model().attribute("outputFormList", outputDtoList))
                 .andDo(print())
     }
-
 }

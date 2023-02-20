@@ -1,15 +1,22 @@
 package com.example.road.direction.service
 
 import com.example.road.api.dto.DocumentDto
+import com.example.road.api.service.KakaoCategorySearchService
+import com.example.road.direction.entity.Direction
+import com.example.road.direction.repository.DirectionRepository
 import com.example.road.pharmacy.dto.PharmacyDto
 import com.example.road.pharmacy.service.PharmacySearchService
 import spock.lang.Specification
 
 class DirectionServiceTest extends Specification {
 
-    private PharmacySearchService pharmacySearchService = Mock();
+    private PharmacySearchService pharmacySearchService = Mock()
+    private DirectionRepository directionRepository = Mock()
+    private KakaoCategorySearchService kakaoCategorySearchService = Mock()
+    private Base62Service base62Service = Mock()
 
-    private DirectionService directionService = new DirectionService(pharmacySearchService)
+    private DirectionService directionService = new DirectionService(
+            pharmacySearchService, directionRepository, kakaoCategorySearchService,base62Service)
 
     private List<PharmacyDto> pharmacyList
 
@@ -46,9 +53,7 @@ class DirectionServiceTest extends Specification {
                 .build()
 
         when:
-        //stub
         pharmacySearchService.searchPharmacyDtoList() >> pharmacyList
-
 
         def results = directionService.buildDirectionList(documentDto)
 
@@ -56,12 +61,10 @@ class DirectionServiceTest extends Specification {
         results.size() == 2
         results.get(0).targetPharmacyName == "호수온누리약국"
         results.get(1).targetPharmacyName == "돌곶이온누리약국"
-
     }
 
     def "buildDirectionList - 정해진 반경 10 km 내에 검색이 되는지 확인"() {
         given:
-        //10 km 넘는 데이터 셋팅
         pharmacyList.add(
                 PharmacyDto.builder()
                         .id(3L)

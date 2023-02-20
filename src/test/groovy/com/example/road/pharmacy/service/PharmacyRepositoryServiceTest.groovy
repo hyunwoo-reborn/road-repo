@@ -4,7 +4,6 @@ import com.example.road.AbstractIntegrationContainerBaseTest
 import com.example.road.pharmacy.entity.Pharmacy
 import com.example.road.pharmacy.repository.PharmacyRepository
 import org.springframework.beans.factory.annotation.Autowired
-import spock.lang.Specification
 
 class PharmacyRepositoryServiceTest extends AbstractIntegrationContainerBaseTest {
 
@@ -20,7 +19,7 @@ class PharmacyRepositoryServiceTest extends AbstractIntegrationContainerBaseTest
 
     def "PharmacyRepository update - dirty checking success"() {
         given:
-        String inputAddress = "서울 특별시 성북구 중앙동"
+        String inputAddress = "서울 특별시 성북구 종암동"
         String modifiedAddress = "서울 광진구 구의동"
         String name = "은혜 약국"
 
@@ -28,9 +27,9 @@ class PharmacyRepositoryServiceTest extends AbstractIntegrationContainerBaseTest
                 .pharmacyAddress(inputAddress)
                 .pharmacyName(name)
                 .build()
+
         when:
         def entity = pharmacyRepository.save(pharmacy)
-        //주소 수정
         pharmacyRepositoryService.updateAddress(entity.getId(), modifiedAddress)
 
         def result = pharmacyRepository.findAll()
@@ -41,7 +40,7 @@ class PharmacyRepositoryServiceTest extends AbstractIntegrationContainerBaseTest
 
     def "PharmacyRepository update - dirty checking fail"() {
         given:
-        String inputAddress = "서울 특별시 성북구 중앙동"
+        String inputAddress = "서울 특별시 성북구 종암동"
         String modifiedAddress = "서울 광진구 구의동"
         String name = "은혜 약국"
 
@@ -49,9 +48,9 @@ class PharmacyRepositoryServiceTest extends AbstractIntegrationContainerBaseTest
                 .pharmacyAddress(inputAddress)
                 .pharmacyName(name)
                 .build()
+
         when:
         def entity = pharmacyRepository.save(pharmacy)
-        //주소 수정
         pharmacyRepositoryService.updateAddressWithoutTransaction(entity.getId(), modifiedAddress)
 
         def result = pharmacyRepository.findAll()
@@ -84,7 +83,7 @@ class PharmacyRepositoryServiceTest extends AbstractIntegrationContainerBaseTest
         result.size() == 1 // 트랜잭션이 적용되지 않는다( 롤백 적용 X )
     }
 
-    def "transactional readOnly test"() {
+    def "transactional readOnly test - 읽기 전용일 경우 dirty checking 반영 되지 않는다. "() {
 
         given:
         String inputAddress = "서울 특별시 성북구"

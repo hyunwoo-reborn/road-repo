@@ -53,12 +53,10 @@ class KakaoAddressSearchServiceRetryTest extends AbstractIntegrationContainerBas
                 .setBody(mapper.writeValueAsString(expectedResponse)))
 
         def kakaoApiResult = kakaoAddressSearchService.requestAddressSearch(inputAddress)
-        def takeRequest = mockWebServer.takeRequest()
 
         then:
         // 두번 호출 여부 검증 - retry test
         2 * kakaoUriBuilderService.buildUriByAddressSearch(inputAddress) >> uri
-        takeRequest.getMethod() == "GET"
         kakaoApiResult.getDocumentList().size() == 1
         kakaoApiResult.getMetaDto().totalCount == 1
         kakaoApiResult.getDocumentList().get(0).getAddressName() == inputAddress

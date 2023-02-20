@@ -11,11 +11,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-@Getter
 @Entity(name = "pharmacy")
+@Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Pharmacy extends BaseTimeEntity {
 
     @Id
@@ -27,7 +27,7 @@ public class Pharmacy extends BaseTimeEntity {
     private double latitude;
     private double longitude;
 
-    public void changePharmacyAddress(String address){
+    public void changePharmacyAddress(String address) {
         this.pharmacyAddress = address;
     }
 }

@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Collections;
 import java.util.List;
@@ -46,22 +47,22 @@ public class PharmacyRecommendationService {
         // 공공기관 약국 데이터 및 거리계산 알고리즘 이용
         List<Direction> directionList = directionService.buildDirectionList(documentDto);
 
-        // kakao 카테고리를 이요한 장소 검색 api 이용
-//        List<Direction> directionList = directionService.buildDirectionListByCategoryApi(documentDto);
+        // kakao 카테고리를 이용한 장소 검색 api 이용
+        //List<Direction> directionList = directionService.buildDirectionListByCategoryApi(documentDto);
 
         return directionService.saveAll(directionList)
                 .stream()
                 .map(this::convertToOutputDto)
                 .collect(Collectors.toList());
-
     }
 
     private OutputDto convertToOutputDto(Direction direction) {
+
         return OutputDto.builder()
                 .pharmacyName(direction.getTargetPharmacyName())
                 .pharmacyAddress(direction.getTargetAddress())
                 .directionUrl(baseUrl + base62Service.encodeDirectionId(direction.getId()))
-                .roadViewUrl(ROAD_VIEW_BASE_URL + direction.getTargetLatitude() + "," + direction.getTargetLatitude())
+                .roadViewUrl(ROAD_VIEW_BASE_URL + direction.getTargetLatitude() + "," + direction.getTargetLongitude())
                 .distance(String.format("%.2f km", direction.getDistance()))
                 .build();
     }

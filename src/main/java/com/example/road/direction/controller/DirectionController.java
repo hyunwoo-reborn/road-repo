@@ -9,27 +9,20 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.util.UriComponentsBuilder;
 
-@Slf4j
 @Controller
+@Slf4j
 @RequiredArgsConstructor
 public class DirectionController {
 
     private final DirectionService directionService;
 
-    private static final String DIRECTION_BASE_URL = "https://map.kakao.com/link/map/";
+    @GetMapping("/dir/{encodedId}")
+    public String searchDirection(@PathVariable("encodedId") String encodedId) {
 
-    @GetMapping("/dir/{encodeId}")
-    public String searchDirection(@PathVariable("encodeId") String encodeId) {
-        Direction resultDirection = directionService.findById(encodeId);
+        String result = directionService.findDirectionUrlById(encodedId);
 
-        String params = String.join(",", resultDirection.getTargetPharmacyName(),
-                String.valueOf(resultDirection.getTargetLatitude()), String.valueOf(resultDirection.getTargetLongitude()));
+        log.info("[DirectionController searchDirection] direction url: {}", result);
 
-        String result = UriComponentsBuilder.fromHttpUrl(DIRECTION_BASE_URL + params)
-                .toUriString();
-
-        log.info("direction params: {}, url: {}", params, result);
-
-        return "redirect:" + result;
+        return "redirect:"+result;
     }
 }

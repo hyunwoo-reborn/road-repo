@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.ObjectUtils;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -26,6 +26,7 @@ public class DirectionService {
 
     private static final int MAX_SEARCH_COUNT = 3; // 약국 최대 검색 갯수
     private static final double RADIUS_KM = 10.0; // 반경 10 km
+    private static final String DIRECTION_BASE_URL = "https://map.kakao.com/link/map/";
 
     private final PharmacySearchService pharmacySearchService;
     private final DirectionRepository directionRepository;
@@ -38,44 +39,42 @@ public class DirectionService {
         return directionRepository.saveAll(directionList);
     }
 
-    public Direction findById(String endcodeId) {
-        Long decodeId = base62Service.decodeDirectionId(endcodeId);
-        return directionRepository.findById(decodeId)
-                .orElse(null);
+    public String findDirectionUrlById(String encodedId) {
+        Long decodedId = base62Service.decodeDirectionId(encodedId);
+        Direction direction = directionRepository.findById(decodedId).orElse(null);
+
+        String params = String.join(",", direction.getTargetPharmacyName(),
+                String.valueOf(direction.getTargetLatitude()), String.valueOf(direction.getTargetLongitude()));
+
+        String result = UriComponentsBuilder.fromHttpUrl(DIRECTION_BASE_URL + params)
+                .toUriString();
+
+        return result;
     }
 
     public List<Direction> buildDirectionList(DocumentDto documentDto) {
 
-        if(ObjectUtils.isEmpty(documentDto)) {
-            return Collections.emptyList();
-        }
+        if(Objects.isNull(documentDto)) return Collections.emptyList();
 
-        // 약국 데이터 조회
-        List<PharmacyDto>  pharmacyDtos = pharmacySearchService.searchPharmacyDtoList();
-
-        // 거리계산 알고리즘을 이용하여, 고객과 약국 사이의 거리를 계산하고 sort
-        return pharmacyDtos.stream()
-                .map(pharmacyDto -> Direction.builder()
-                        .inputAddress(documentDto.getAddressName())
-                        .inputLatitude(documentDto.getLatitude())
-                        .inputLongitude(documentDto.getLongitude())
-                        .targetPharmacyName(pharmacyDto.getPharmacyName())
-                        .targetAddress(pharmacyDto.getPharmacyAddress())
-                        .targetLatitude(pharmacyDto.getLatitude())
-                        .targetLongitude(pharmacyDto.getLongitude())
-                        .distance(
-                                calculateDistance(documentDto.getLatitude(),
-                                        documentDto.getLongitude(),
-                                        pharmacyDto.getLatitude(),
-                                        pharmacyDto.getLongitude())
-                        )
-                        .build())
+        return pharmacySearchService.searchPharmacyDtoList()
+                .stream().map(pharmacyDto ->
+                    Direction.builder()
+                            .inputAddress(documentDto.getAddressName())
+                            .inputLatitude(documentDto.getLatitude())
+                            .inputLongitude(documentDto.getLongitude())
+                            .targetPharmacyName(pharmacyDto.getPharmacyName())
+                            .targetAddress(pharmacyDto.getPharmacyAddress())
+                            .targetLatitude(pharmacyDto.getLatitude())
+                            .targetLongitude(pharmacyDto.getLongitude())
+                            .distance(
+                                    calculateDistance(documentDto.getLatitude(), documentDto.getLongitude(),
+                                            pharmacyDto.getLatitude(), pharmacyDto.getLongitude())
+                            )
+                            .build())
                 .filter(direction -> direction.getDistance() <= RADIUS_KM)
                 .sorted(Comparator.comparing(Direction::getDistance))
                 .limit(MAX_SEARCH_COUNT)
                 .collect(Collectors.toList());
-
-
     }
 
     // pharmacy search by category kakao api

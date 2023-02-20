@@ -17,17 +17,17 @@ class PharmacyRepositoryTest extends AbstractIntegrationContainerBaseTest {
 
     def "PharmacyRepository save"() {
         given:
-        String address = "서울 특별시 성북구 중앙동"
+        String address = "서울 특별시 성북구 종암동"
         String name = "은혜 약국"
         double latitude = 36.11
         double longitude = 128.11
 
         def pharmacy = Pharmacy.builder()
-            .pharmacyAddress(address)
-            .pharmacyName(name)
-            .latitude(latitude)
-            .longitude(longitude)
-            .build()
+                .pharmacyAddress(address)
+                .pharmacyName(name)
+                .latitude(latitude)
+                .longitude(longitude)
+                .build()
 
         when:
         def result = pharmacyRepository.save(pharmacy)
@@ -37,12 +37,11 @@ class PharmacyRepositoryTest extends AbstractIntegrationContainerBaseTest {
         result.getPharmacyName() == name
         result.getLatitude() == latitude
         result.getLongitude() == longitude
-
     }
 
     def "PharmacyRepository saveAll"() {
         given:
-        String address = "서울 특별시 성북구 중앙동"
+        String address = "서울 특별시 성북구 종암동"
         String name = "은혜 약국"
         double latitude = 36.11
         double longitude = 128.11
@@ -60,7 +59,6 @@ class PharmacyRepositoryTest extends AbstractIntegrationContainerBaseTest {
 
         then:
         result.size() == 1
-
     }
 
     def "BaseTimeEntity 등록"() {
@@ -79,7 +77,7 @@ class PharmacyRepositoryTest extends AbstractIntegrationContainerBaseTest {
         def result = pharmacyRepository.findAll()
 
         then:
-        result.get(0).getCreateDate().isAfter(now)
+        result.get(0).getCreatedDate().isAfter(now)
         result.get(0).getModifiedDate().isAfter(now)
     }
 }

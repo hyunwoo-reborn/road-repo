@@ -3,8 +3,8 @@ package com.example.road.api.service;
 import com.example.road.api.dto.KakaoApiResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpEntity;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,7 @@ public class KakaoCategorySearchService {
 
     private static final String PHARMACY_CATEGORY = "PM9"; // 약국 카테고리
 
-    @Value("${KAKAO_REST_API_KEY}")
+    @Value("${kakao.rest.api.key}")
     private String kakaoRestApiKey;
 
     public KakaoApiResponseDto requestPharmacyCategorySearch(double latitude, double longitude, double radius) {
@@ -36,5 +36,4 @@ public class KakaoCategorySearchService {
 
         return restTemplate.exchange(uri, HttpMethod.GET, httpEntity, KakaoApiResponseDto.class).getBody();
     }
-
 }
